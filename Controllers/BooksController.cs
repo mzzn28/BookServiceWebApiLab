@@ -16,29 +16,66 @@ namespace BookServiceWebApiLab.Controllers
     public class BooksController : ApiController
     {
         private BookServiceContext db = new BookServiceContext();
-
+       
         // GET: api/Books
-        public IQueryable<Book> GetBooks()
+        /// <summary>
+        /// Gets the books.
+        /// </summary>
+        public IQueryable<BookDTO> GetBooks()
         {
-            return db.Books;
+            //return db.Books
+        // .Include(b => b.Author);
+            var books = from b in db.Books
+                        select new BookDTO()
+                        {
+                            Id = b.Id,
+                            Title = b.Title,
+                            AuthorName = b.Author.Name
+                        };
+
+            return books;
         }
 
         // GET: api/Books/5
-        [ResponseType(typeof(Book))]
+        /// <summary>
+        /// Gets the book with specific id.
+        /// </summary>
+       
+        [ResponseType(typeof(BookDetailDTO))]
         public async Task<IHttpActionResult> GetBook(int id)
         {
-            Book book = await db.Books.FindAsync(id);
-            if (book == null)
-            {
-                return NotFound();
-            }
+              var book = await db.Books.Include(b => b.Author).Select(b =>
+                new BookDetailDTO()
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Year = b.Year,
+                    Price = b.Price,
+                    AuthorName = b.Author.Name,
+                    Genre = b.Genre
+                }).SingleOrDefaultAsync(b => b.Id == id);
+                    if (book == null)
+                    {
+                        return NotFound();
+                    }
 
-            return Ok(book);
+                    return Ok(book);
+
+                    //Book book = await db.Books.FindAsync(id);
+                    //if (book == null)
+                    //{
+                    //    return NotFound();
+                    //}
+
+                    //return Ok(book);
         }
 
         // PUT: api/Books/5
+        /// <summary>
+        /// change the book content.
+        /// </summary>
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutBook(int id, Book book)
+        public async Task<IHttpActionResult> PutBook(int id, Book book)//change the object
         {
             if (!ModelState.IsValid)
             {
@@ -72,6 +109,9 @@ namespace BookServiceWebApiLab.Controllers
         }
 
         // POST: api/Books
+        /// <summary>
+        /// Post the book.
+        /// </summary>
         [ResponseType(typeof(Book))]
         public async Task<IHttpActionResult> PostBook(Book book)
         {
@@ -87,6 +127,9 @@ namespace BookServiceWebApiLab.Controllers
         }
 
         // DELETE: api/Books/5
+        /// <summary>
+        /// Delete the book.
+        /// </summary>
         [ResponseType(typeof(Book))]
         public async Task<IHttpActionResult> DeleteBook(int id)
         {
@@ -101,7 +144,10 @@ namespace BookServiceWebApiLab.Controllers
 
             return Ok(book);
         }
-
+        // Dispose: api/Books/5
+        /// <summary>
+        /// Dispose book.
+        /// </summary>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

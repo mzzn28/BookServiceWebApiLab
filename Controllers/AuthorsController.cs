@@ -90,7 +90,7 @@ namespace BookServiceWebApiLab.Controllers
         [ResponseType(typeof(Author))]
         public async Task<IHttpActionResult> DeleteAuthor(int id)
         {
-            Author author = await db.Authors.FindAsync(id);
+            Author author = await db.Authors.FindAsync(id); // asynchronous aproach to find the entry in db
             if (author == null)
             {
                 return NotFound();

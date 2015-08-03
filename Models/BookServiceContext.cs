@@ -17,6 +17,8 @@ namespace BookServiceWebApiLab.Models
     
         public BookServiceContext() : base("name=BookServiceContext")
         {
+            // New code to generate 
+            this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
 
         public System.Data.Entity.DbSet<BookServiceWebApiLab.Models.Author> Authors { get; set; }
